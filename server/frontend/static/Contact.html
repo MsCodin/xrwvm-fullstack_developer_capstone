@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    .banner {
+      padding: 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, #008b8b, #20b2aa);
+      color: white;
+    }
+    .contact-card {
+      border: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 700px;
+      margin: 3rem auto;
+      background: white;
+    }
+    .contact-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    .contact-item:last-child {
+      border-bottom: none;
+    }
+    .contact-label {
+      font-weight: 700;
+      color: #008b8b;
+      min-width: 100px;
+      display: inline-block;
+    }
+    .contact-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-light" style="background-color:darkturquoise; height: 1in;">
+    <div class="container-fluid">
+      <h2 style="padding-right: 5%; color: white; font-weight: 700;">Best Cars Dealership</h2>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" style="font-size: larger; color: white;" aria-current="page" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" style="font-size: larger; color: white;" href="/about">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" style="font-size: larger; color: white; font-weight: 600;" href="/contact">Contact Us</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Banner -->
+  <div class="banner">
+    <h1>Contact Us</h1>
+    <p style="font-size: 1.15rem; max-width: 700px; margin: 0.5rem auto 0;">
+      We'd love to hear from you — reach out anytime and our team will get back to you as soon as possible.
+    </p>
+  </div>
+
+  <!-- Contact Content -->
+  <div class="contact-card">
+    <p class="contact-title">📍 Get in Touch</p>
+
+    <div class="contact-item">
+      <span class="contact-label">📍 Address:</span>
+      123 Auto Plaza, Motor Drive,<br>
+      Bestville, NG9 5XY, United Kingdom
+    </div>
+
+    <div class="contact-item">
+      <span class="contact-label">📞 Phone:</span>
+      +44 (0)115 496 0872
+    </div>
+
+    <div class="contact-item">
+      <span class="contact-label">✉️ Email:</span>
+      info@bestcarsdeals.com
+    </div>
+
+    <div class="contact-item">
+      <span class="contact-label">🕐 Hours:</span>
+      Mon–Fri: 9:00 AM – 7:00 PM<br>
+      Sat: 10:00 AM – 5:00 PM<br>
+      Sun: 11:00 AM – 4:00 PM
+    </div>
+
+    <div class="contact-item">
+      <span class="contact-label">🌐 Social:</span>
+      @BestCarsDeals — Facebook, Instagram &amp; X/Twitter
+    </div>
+  </div>
+
+</body>
+</html>
