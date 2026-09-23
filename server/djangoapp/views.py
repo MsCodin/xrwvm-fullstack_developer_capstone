@@ -1,13 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib.auth.models import User
-from django.contrib.auth import logout, login, authenticate
+from django.contrib import logout, login, authenticate
 from django.contrib import messages
 from datetime import datetime
 import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
+from .restapis import get_request, analyze_review_sentiments
 
 logger = logging.getLogger(__name__)
 
@@ -121,3 +122,34 @@ def get_cars(request):
             ]
         })
     return JsonResponse({"cars": data})
+
+
+# === Dealership & Review Functions ===
+def get_dealerships(request, state="All"):
+    if state == "All":
+        endpoint = "/fetchDealers"
+    else:
+        endpoint = "/fetchDealers/" + state
+    dealerships = get_request(endpoint)
+    return JsonResponse({"status": 200, "dealers": dealerships})
+
+
+def get_dealer_details(request, dealer_id):
+    endpoint = f"/fetchDealer/{dealer_id}"
+    dealership = get_request(endpoint)
+    return JsonResponse({"status": 200, "dealer": dealership})
+
+
+def get_dealer_reviews(request, dealer_id):
+    endpoint = f"/fetchReviews/dealer/{dealer_id}"
+    reviews = get_request(endpoint)
+    
+    if reviews:
+        for review_detail in reviews:
+            sentiment = analyze_review_sentiments(review_detail['review'])
+            if sentiment:
+                review_detail['sentiment'] = sentiment.get('sentiment', 'neutral')
+            else:
+                review_detail['sentiment'] = 'neutral'
+    
+    return JsonResponse({"status": 200, "reviews": reviews})
