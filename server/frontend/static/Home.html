@@ -29,10 +29,12 @@ const logout = async (e) => {
 let checkSession = () => {
   let curr_user = sessionStorage.getItem("username");
   if (curr_user && curr_user !== "") {
+    // ✅ Logged in = show username + Logout
     document.getElementById("loginlogout").innerHTML = 
     '<span class="homepage_links">' + curr_user + '</span>' +
     '<a class="homepage_links" onclick="logout()" href="/">Logout</a>'
   } else {
+    // ✅ Not logged in = show Login + Register
     document.getElementById("loginlogout").innerHTML = 
     '<a class="homepage_links" href="/login">Login</a>' +
     '<a class="homepage_links" href="/register">Register</a>'
