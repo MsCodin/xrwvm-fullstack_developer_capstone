@@ -1,0 +1,35 @@
+name: Lint Code
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python tools
+        run: pip install flake8
+
+      - name: Run Python Lint
+        run: flake8 . --max-line-length=120 --exclude=node_modules,venv,__pycache__,db.sqlite3,manage.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Node dependencies
+        working-directory: frontend
+        run: npm install --legacy-peer-deps
+
+      - name: Run JS Lint
+        working-directory: frontend
+        run: npm run lint
