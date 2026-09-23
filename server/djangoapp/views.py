@@ -1,14 +1,11 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import logout, login, authenticate
-from django.contrib import messages
-from datetime import datetime
 import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
-from .restapis import get_request, analyze_review_sentiments, post_review  # ← Added post_review
+from .restapis import get_request, analyze_review_sentiments, post_review
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +17,7 @@ def login_user(request):
         username = data.get('userName')
         password = data.get('password')
         user = authenticate(request, username=username, password=password)
-        
+
         if user is not None:
             login(request, user)
             return JsonResponse({"userName": username, "status": "Authenticated"})
@@ -45,10 +42,10 @@ def registration(request):
         first_name = data.get('firstName')
         last_name = data.get('lastName')
         email = data.get('email')
-        
+
         if User.objects.filter(username=username).exists():
             return JsonResponse({"userName": username, "error": "Already Registered"}, status=409)
-        
+
         user = User.objects.create_user(
             username=username,
             first_name=first_name,
@@ -63,7 +60,6 @@ def registration(request):
         return JsonResponse({"error": "Invalid request"}, status=400)
 
 
-# === Car Data Functions ===
 def initiate():
     car_make_data = [
         {"name": "NISSAN", "description": "Great cars. Japanese technology"},
@@ -72,7 +68,7 @@ def initiate():
         {"name": "Kia", "description": "Great cars. Korean technology"},
         {"name": "Toyota", "description": "Great cars. Japanese technology"},
     ]
-    
+
     car_make_instances = []
     for data in car_make_data:
         car_make_instances.append(
@@ -96,7 +92,7 @@ def initiate():
         {"name": "Camry", "type": "Sedan", "year": 2023, "dealer_id": 5, "car_make": car_make_instances[4]},
         {"name": "Kluger", "type": "SUV", "year": 2023, "dealer_id": 5, "car_make": car_make_instances[4]},
     ]
-    
+
     for data in car_model_data:
         CarModel.objects.create(
             name=data['name'],
@@ -124,7 +120,6 @@ def get_cars(request):
     return JsonResponse({"cars": data})
 
 
-# === Dealership & Review Functions ===
 def get_dealerships(request, state="All"):
     if state == "All":
         endpoint = "/fetchDealers"
@@ -143,7 +138,7 @@ def get_dealer_details(request, dealer_id):
 def get_dealer_reviews(request, dealer_id):
     endpoint = f"/fetchReviews/dealer/{dealer_id}"
     reviews = get_request(endpoint)
-    
+
     if reviews:
         for review_detail in reviews:
             sentiment = analyze_review_sentiments(review_detail['review'])
@@ -151,7 +146,7 @@ def get_dealer_reviews(request, dealer_id):
                 review_detail['sentiment'] = sentiment.get('sentiment', 'neutral')
             else:
                 review_detail['sentiment'] = 'neutral'
-    
+
     return JsonResponse({"status": 200, "reviews": reviews})
 
 
