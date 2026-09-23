@@ -1,4 +1,3 @@
-# Uncomment the required imports before adding the code
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib.auth.models import User
@@ -8,51 +7,45 @@ from datetime import datetime
 import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
-# from .populate import initiate
 
-# Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-# Create your views here.
-
-# Create a `login_user` view to handle sign in request
 @csrf_exempt
 def login_user(request):
-    data = json.loads(request.body)
-    username = data['userName']
-    password = data['password']
-    user = authenticate(username=username, password=password)
-    response_data = {"userName": username}
-    if user is not None:
-        login(request, user)
-        response_data = {"userName": username, "status": "Authenticated"}
-    return JsonResponse(response_data)
+    try:
+        data = json.loads(request.body)
+        username = data.get('userName')
+        password = data.get('password')
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return JsonResponse({"userName": username, "status": "Authenticated"})
+        else:
+            return JsonResponse({"userName": username, "status": "Failed"}, status=401)
+    except Exception as e:
+        logger.error(f"Login error: {e}")
+        return JsonResponse({"error": "Invalid request"}, status=400)
 
-# Create a `logout_request` view to handle sign out request
+
 def logout_request(request):
     logout(request)
-    data = {"userName": ""}
-    return JsonResponse(data)
+    return JsonResponse({"userName": ""})
 
-# Create a `registration` view to handle sign up request — EXACT spec
+
 @csrf_exempt
 def registration(request):
-    context = {}
-    data = json.loads(request.body)
-    username = data['userName']
-    password = data['password']
-    first_name = data['firstName']
-    last_name = data['lastName']
-    email = data['email']
-    
-    username_exist = False
     try:
-        User.objects.get(username=username)
-        username_exist = True
-    except:
-        logger.debug("{} is new user".format(username))
-    
-    if not username_exist:
+        data = json.loads(request.body)
+        username = data.get('userName')
+        password = data.get('password')
+        first_name = data.get('firstName')
+        last_name = data.get('lastName')
+        email = data.get('email')
+
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({"userName": username, "error": "Already Registered"}, status=409)
+
         user = User.objects.create_user(
             username=username,
             first_name=first_name,
@@ -61,8 +54,7 @@ def registration(request):
             email=email
         )
         login(request, user)
-        data = {"userName": username, "status": "Authenticated"}
-        return JsonResponse(data)
-    else:
-        data = {"userName": username, "error": "Already Registered"}
-        return JsonResponse(data)
+        return JsonResponse({"userName": username, "status": "Authenticated"})
+    except Exception as e:
+        logger.error(f"Registration error: {e}")
+        return JsonResponse({"error": "Invalid request"}, status=400)
