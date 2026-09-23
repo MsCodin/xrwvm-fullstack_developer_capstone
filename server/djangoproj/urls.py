@@ -8,7 +8,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('djangoapp/', include('djangoapp.urls')),
 
-    # Serve React frontend pages
     path('dealers/', TemplateView.as_view(template_name="index.html")),
     path('dealer/<int:dealer_id>', TemplateView.as_view(template_name="index.html")),
     path('postreview/<int:dealer_id>', TemplateView.as_view(template_name="index.html")),
