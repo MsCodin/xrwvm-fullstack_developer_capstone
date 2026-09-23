@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.timezone import now
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
@@ -16,7 +15,6 @@ class CarMake(models.Model):
 
 class CarModel(models.Model):
     """Model representing a specific car model linked to a CarMake."""
-    
     CAR_TYPE_CHOICES = [
         ('Sedan', 'Sedan'),
         ('SUV', 'SUV'),
@@ -25,7 +23,6 @@ class CarModel(models.Model):
         ('Coupe', 'Coupe'),
         ('Truck', 'Truck'),
     ]
-
     car_make = models.ForeignKey(
         CarMake,
         on_delete=models.CASCADE,
