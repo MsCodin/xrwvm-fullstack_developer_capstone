@@ -8,8 +8,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('djangoapp/', include('djangoapp.urls')),
     
-    # Serve React frontend at /dealers
+    # Serve React frontend pages
     path('dealers/', TemplateView.as_view(template_name="index.html")),
+    path('dealer/<int:dealer_id>', TemplateView.as_view(template_name="index.html")),  # ✅ Added
     
     path('', TemplateView.as_view(template_name="Home.html")),
     path('about/', TemplateView.as_view(template_name="About.html")),
