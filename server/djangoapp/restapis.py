@@ -17,24 +17,35 @@ def get_request(endpoint, **kwargs):
     if kwargs:
         for key, value in kwargs.items():
             params = params + key + "=" + str(value) + "&"
-    
-    request_url = backend_url + endpoint + "?" + params
-    print("GET from {} ".format(request_url))
-    
+
+    # Prevent double slashes
+    if backend_url.endswith('/'):
+        request_url = backend_url + endpoint.lstrip('/')
+    else:
+        request_url = backend_url + endpoint
+
+    if params:
+        request_url = request_url + "?" + params
+
+    print("GET from", request_url)
+
     try:
-        # Call get method of requests library with URL and parameters
         response = requests.get(request_url)
         return response.json()
     except Exception as e:
-        # If any error occurs
         print(f"Network exception occurred: {e}")
         return None
 
 
 def analyze_review_sentiments(text):
-    request_url = sentiment_analyzer_url + "analyze/" + text
-    print("GET from {} ".format(request_url))
-    
+    # Prevent double slashes
+    if sentiment_analyzer_url.endswith('/'):
+        request_url = sentiment_analyzer_url + "analyze/" + text
+    else:
+        request_url = sentiment_analyzer_url + "/analyze/" + text
+
+    print("GET from", request_url)
+
     try:
         response = requests.get(request_url)
         return response.json()
@@ -44,9 +55,14 @@ def analyze_review_sentiments(text):
 
 
 def post_review(data_dict):
-    request_url = backend_url + "/insert_review"
-    print("POST to {} ".format(request_url))
-    
+    # Prevent double slashes
+    if backend_url.endswith('/'):
+        request_url = backend_url + "insert_review"
+    else:
+        request_url = backend_url + "/insert_review"
+
+    print("POST to", request_url)
+
     try:
         response = requests.post(request_url, json=data_dict)
         print(response.status_code)
