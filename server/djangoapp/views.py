@@ -1,14 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib.auth.models import User
-from django.contrib import logout, login, authenticate
+from django.contrib.auth import logout, login, authenticate
 from django.contrib import messages
 from datetime import datetime
 import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
-from .restapis import get_request, analyze_review_sentiments
+from .restapis import get_request, analyze_review_sentiments, post_review  # ← Added post_review
 
 logger = logging.getLogger(__name__)
 
@@ -153,3 +153,17 @@ def get_dealer_reviews(request, dealer_id):
                 review_detail['sentiment'] = 'neutral'
     
     return JsonResponse({"status": 200, "reviews": reviews})
+
+
+@csrf_exempt
+def add_review(request):
+    if not request.user.is_anonymous:
+        data = json.loads(request.body)
+        try:
+            post_review(data)
+            return JsonResponse({"status": 200})
+        except Exception as e:
+            logger.error(f"Post review error: {e}")
+            return JsonResponse({"status": 401, "message": "Error in posting review"})
+    else:
+        return JsonResponse({"status": 403, "message": "Unauthorized"})
