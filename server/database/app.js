@@ -11,28 +11,33 @@ app.use(require('body-parser').urlencoded({ extended: false }));
 const reviews_data = JSON.parse(fs.readFileSync("reviews.json", 'utf8'));
 const dealerships_data = JSON.parse(fs.readFileSync("dealerships.json", 'utf8'));
 
-mongoose.connect("mongodb://mongo_db:27017/", { dbName: 'dealershipsDB' });
-
 const Reviews = require('./review');
 const Dealerships = require('./dealership');
 
-try {
-  Reviews.deleteMany({}).then(() => {
-    Reviews.insertMany(reviews_data['reviews']);
-  });
-  Dealerships.deleteMany({}).then(() => {
-    Dealerships.insertMany(dealerships_data['dealerships']);
-  });
-} catch (error) {
-  console.log(error);
-}
+// ✅ Wait for FULL data load BEFORE starting server
+const initDB = async () => {
+  try {
+    await mongoose.connect("mongodb://mongo_db:27017/", { dbName: 'dealershipsDB' });
+    console.log('Connected to DB ✅');
 
-// Express route to home
+    await Reviews.deleteMany({});
+    await Reviews.insertMany(reviews_data['reviews']);
+    console.log('Reviews seeded ✅');
+
+    await Dealerships.deleteMany({});
+    await Dealerships.insertMany(dealerships_data['dealerships']);
+    console.log('Dealerships seeded ✅');
+  } catch (error) {
+    console.error('DB init error:', error);
+    process.exit(1);
+  }
+};
+
+// --- Routes (unchanged — kept exactly as you had) ---
 app.get('/', async (req, res) => {
   res.send("Welcome to the Mongoose API");
 });
 
-// Fetch all reviews
 app.get('/fetchReviews', async (req, res) => {
   try {
     const documents = await Reviews.find();
@@ -42,7 +47,6 @@ app.get('/fetchReviews', async (req, res) => {
   }
 });
 
-// Fetch reviews by dealer ID
 app.get('/fetchReviews/dealer/:id', async (req, res) => {
   try {
     const documents = await Reviews.find({ dealership: parseInt(req.params.id) });
@@ -52,7 +56,6 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
   }
 });
 
-// ✅ Fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
   try {
     const documents = await Dealerships.find();
@@ -62,7 +65,6 @@ app.get('/fetchDealers', async (req, res) => {
   }
 });
 
-// ✅ Fetch dealerships by state
 app.get('/fetchDealers/:state', async (req, res) => {
   try {
     const documents = await Dealerships.find({ state: req.params.state });
@@ -72,7 +74,6 @@ app.get('/fetchDealers/:state', async (req, res) => {
   }
 });
 
-// ✅ Fetch single dealership by ID
 app.get('/fetchDealer/:id', async (req, res) => {
   try {
     const document = await Dealerships.findOne({ id: parseInt(req.params.id) });
@@ -82,13 +83,11 @@ app.get('/fetchDealer/:id', async (req, res) => {
   }
 });
 
-// Insert new review
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
   try {
-    data = JSON.parse(req.body);
+    const data = JSON.parse(req.body);
     const documents = await Reviews.find().sort({ id: -1 });
-    let new_id = documents[0]['id'] + 1;
-
+    const new_id = documents[0]['id'] + 1;
     const review = new Reviews({
       id: new_id,
       name: data['name'],
@@ -100,7 +99,6 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
       car_model: data['car_model'],
       car_year: data['car_year'],
     });
-
     const savedReview = await review.save();
     res.json(savedReview);
   } catch (error) {
@@ -109,7 +107,9 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
   }
 });
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+// ✅ Start server ONLY after DB + data are fully ready
+initDB().then(() => {
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
 });
