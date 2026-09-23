@@ -45,7 +45,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'frontend/build'),
+            os.path.join(BASE_DIR, 'frontend/static'),      # ← Added: Home.html, About.html, Contact.html
+            os.path.join(BASE_DIR, 'frontend/build'),        # ← Kept: index.html
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -85,6 +86,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontend/build/static'),
+    os.path.join(BASE_DIR, 'frontend/static'),     # ← Added: serve static files
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
